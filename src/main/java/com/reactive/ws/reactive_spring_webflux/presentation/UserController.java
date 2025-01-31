@@ -6,6 +6,7 @@ import com.reactive.ws.reactive_spring_webflux.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,6 +34,9 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
+    // Spring Security Expression Language (SpEL) - Allows you to define spring security rules and access controls in your spring applications
+    // @PreAuthorize("authentication.principal.equals(#userId.toString()) or hasAnyRole('ROLE_ADMIN')")
+    @PostAuthorize("returnObject.body!=null and (returnObject.body.id.toString().equals(authentication.principal))")
     public Mono<ResponseEntity<UserRest>> getUser(@PathVariable("userId") UUID userId) {
         return userService.getUserById(userId)
                 .map(userRest -> ResponseEntity.status(HttpStatus.OK).body(userRest))
@@ -42,6 +46,6 @@ public class UserController {
     @GetMapping
     public Flux<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
                                    @RequestParam(value = "limit", defaultValue = "50") int limit) {
-        return userService.findAll(page,limit);
+        return userService.findAll(page, limit);
     }
 }
