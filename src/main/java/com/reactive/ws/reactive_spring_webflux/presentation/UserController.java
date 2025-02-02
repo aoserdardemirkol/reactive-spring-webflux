@@ -5,6 +5,7 @@ import com.reactive.ws.reactive_spring_webflux.presentation.model.UserRest;
 import com.reactive.ws.reactive_spring_webflux.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -47,5 +48,14 @@ public class UserController {
     public Flux<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
                                    @RequestParam(value = "limit", defaultValue = "50") int limit) {
         return userService.findAll(page, limit);
+    }
+
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<UserRest> streamUsers() {
+        /*
+        return Flux.interval(Duration.ofSeconds(1))
+                .map(sequence -> "Event " + sequence);
+         */
+        return userService.streamUser();
     }
 }
